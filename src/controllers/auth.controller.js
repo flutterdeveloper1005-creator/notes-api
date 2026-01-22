@@ -102,7 +102,29 @@ const login = async (req, res) => {
   }
 };
 
+const getMe = async (req, res) => {
+  try {
+    // req.user is set by auth middleware
+    res.status(200).json({
+      message: "User fetched successfully",
+      data: {
+        id: req.user._id,
+        name: req.user.name,
+        email: req.user.email,
+        createdAt: req.user.createdAt,
+      },
+    });
+  } catch (error) {
+    console.error("Get me error:", error);
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+
 module.exports = {
   signup,
   login,
+  getMe,
 };
