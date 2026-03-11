@@ -74,6 +74,122 @@ const addToCart = async (req, res) => {
   }
 };
 
+const removeFromCart = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { productId } = req.params;
+
+    if (!productId) {
+      return res.status(400).json({
+        message: "Product id is required",
+      });
+    }
+
+    // Find user's cart
+    const cart = await Cart.findOne({ userId });
+
+    if (!cart) {
+      return res.status(404).json({
+        message: "Cart not found",
+      });
+    }
+
+    // Check if product exists in cart
+    const itemIndex = cart.items.findIndex(
+      (item) => item.productId.toString() === productId
+    );
+
+    if (itemIndex === -1) {
+      return res.status(404).json({
+        message: "Product not found in cart",
+      });
+    }
+
+    // Remove the item
+    cart.items.splice(itemIndex, 1);
+
+    await cart.save();
+
+    return res.status(200).json({
+      message: "Item removed from cart",
+      data: cart,
+    });
+  } catch (error) {
+    console.error("Remove from cart error:", error);
+
+    if (error.name === "CastError") {
+      return res.status(400).json({
+        message: "Invalid product id",
+      });
+    }
+
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+const updateCartItemQuantity = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { productId, quantity } = req.body;
+
+    if (!productId || quantity === undefined) {
+      return res.status(400).json({
+        message: "Product id and quantity are required",
+      });
+    }
+
+    if (quantity < 1) {
+      return res.status(400).json({
+        message: "Quantity must be at least 1",
+      });
+    }
+
+    // Find user's cart
+    const cart = await Cart.findOne({ userId });
+
+    if (!cart) {
+      return res.status(404).json({
+        message: "Cart not found",
+      });
+    }
+
+    // Find the product in cart
+    const itemIndex = cart.items.findIndex(
+      (item) => item.productId.toString() === productId
+    );
+
+    if (itemIndex === -1) {
+      return res.status(404).json({
+        message: "Product not found in cart",
+      });
+    }
+
+    // Update quantity
+    cart.items[itemIndex].quantity = quantity;
+
+    await cart.save();
+
+    return res.status(200).json({
+      message: "Cart item quantity updated",
+      data: cart,
+    });
+  } catch (error) {
+    console.error("Update cart quantity error:", error);
+
+    if (error.name === "CastError") {
+      return res.status(400).json({
+        message: "Invalid product id",
+      });
+    }
+
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
 const getCart = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -109,5 +225,7 @@ const getCart = async (req, res) => {
 
 module.exports = {
   addToCart,
+  removeFromCart,
+  updateCartItemQuantity,
   getCart
 };
