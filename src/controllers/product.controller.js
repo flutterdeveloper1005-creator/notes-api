@@ -1,4 +1,5 @@
 const Product = require("../models/product.model");
+const { PRODUCT_CATEGORIES } = require("../constants/product.constants");
 
 /**
  * CREATE PRODUCT
@@ -151,6 +152,7 @@ const getSimilarProducts = async (req, res) => {
 
 const getProductById = async (req, res) => {
   try {
+    console.log("getProductById executed");
     const { productId } = req.params;
 
     // Basic ID validation
@@ -191,10 +193,26 @@ const getProductById = async (req, res) => {
   }
 };
 
+const getProductCategories = async (req, res) => {
+  try {
+    console.log("getProductCategories executed");
+    return res.status(200).json({
+      message: "Categories fetched successfully",
+      data: PRODUCT_CATEGORIES,
+    });
+  } catch (error) {
+    console.error("Get categories error:", error);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
 
 module.exports = {
   createProduct,
   getAllProducts,
   getSimilarProducts,
   getProductById,
+  getProductCategories,
 };

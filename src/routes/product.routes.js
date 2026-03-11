@@ -3,7 +3,8 @@ const {
   createProduct,
   getAllProducts,
   getSimilarProducts,
-  getProductById
+  getProductById,
+  getProductCategories
 } = require("../controllers/product.controller");
 const authMiddleware = require("../middleware/auth.middleware");
 
@@ -15,11 +16,9 @@ const router = express.Router();
  */
 router.post("/create", authMiddleware, createProduct);
 
-/**
- * GET ALL PRODUCTS (GLOBAL)
- * GET /products/all
- */
 router.get("/all", authMiddleware, getAllProducts);
+
+router.get("/categories", authMiddleware, getProductCategories);
 
 router.get("/similar/:productId", authMiddleware, getSimilarProducts);
 

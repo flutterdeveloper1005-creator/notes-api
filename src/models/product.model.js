@@ -1,14 +1,16 @@
 const mongoose = require("mongoose");
+const { PRODUCT_CATEGORIES } = require("../constants/product.constants");
+const CATEGORY_VALUES = PRODUCT_CATEGORIES.map(c => c.value);
 
-const PRODUCT_CATEGORIES = [
-  "electronics",
-  "fashion",
-  "accessories",
-  "home",
-  "beauty",
-  "sports",
-  "shoes"
-];
+// const PRODUCT_CATEGORIES = [
+//   "electronics",
+//   "fashion",
+//   "accessories",
+//   "home",
+//   "beauty",
+//   "sports",
+//   "shoes"
+// ];
 
 const productSchema = new mongoose.Schema(
   {
@@ -25,9 +27,12 @@ const productSchema = new mongoose.Schema(
 
     category: {
       type: String,
-      required: true,
-      enum: PRODUCT_CATEGORIES, // 🔒 enum enforcement
-      index: true, // 🔥 important for filtering
+      required: [true, "Category is required"],
+      enum: {
+        values: CATEGORY_VALUES,
+        message: "Invalid category"
+      },
+      index: true,
     },
 
     price: {
