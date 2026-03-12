@@ -5,6 +5,7 @@ const noteRoutes = require("./routes/note.routes");
 const authRoutes = require("./routes/auth.routes");
 const productRoutes = require("./routes/product.routes");
 const cartRoutes = require("./routes/cart.routes");
+const chatRoutes = require("./routes/chat.routes");
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use("/getAllNotes", noteRoutes);
 app.use("/auth", authRoutes);
 app.use("/products", productRoutes);
 app.use("/cart", cartRoutes);
+app.use("/chat", chatRoutes);
 
 
 module.exports = app;
