@@ -1,12 +1,13 @@
 const SupportConversation = require("../models/supportConversation.model");
 const SupportMessage = require("../models/supportMessage.model");
+const { getIO } = require("../socket/socket");
 
 
 // USER SEND MESSAGE
 exports.sendUserMessage = async (req, res) => {
   try {
 
-    const userId = req.user._id; // from JWT
+    const userId = req.user._id;
     const { message } = req.body;
 
     if (!message) {
@@ -18,7 +19,6 @@ exports.sendUserMessage = async (req, res) => {
 
     let conversation = await SupportConversation.findOne({ userId });
 
-    // Create conversation if not exists
     if (!conversation) {
       conversation = await SupportConversation.create({
         userId,
@@ -40,6 +40,14 @@ exports.sendUserMessage = async (req, res) => {
     conversation.lastMessage = message;
     conversation.lastMessageAt = new Date();
     await conversation.save();
+
+    // 🔹 SOCKET EMIT
+    const io = getIO();
+
+    io.to(userId.toString()).emit("support:new-message", {
+      conversationId: conversation._id,
+      message: newMessage
+    });
 
     res.json({
       success: true,
@@ -139,6 +147,14 @@ exports.sendAdminMessage = async (req, res) => {
     conversation.lastMessage = message;
     conversation.lastMessageAt = new Date();
     await conversation.save();
+
+    // 🔹 SOCKET EMIT
+    const io = getIO();
+
+    io.to(userId.toString()).emit("support:new-message", {
+      conversationId: conversation._id,
+      message: newMessage
+    });
 
     res.json({
       success: true,
