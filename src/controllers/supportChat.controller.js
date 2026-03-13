@@ -44,8 +44,8 @@ exports.sendUserMessage = async (req, res) => {
     // 🔹 SOCKET EMIT
     const io = getIO();
 
-    console.log("Emitting realtime message to:", userId);
-    console.log("message sent by user: ", newMessage);
+    // console.log("Emitting realtime message to:", userId);
+    // console.log("message sent by user: ", newMessage);
 
 
     io.to(userId.toString()).emit("support:new-message", {
@@ -155,8 +155,8 @@ exports.sendAdminMessage = async (req, res) => {
     // 🔹 SOCKET EMIT
     const io = getIO();
 
-    console.log("Emitting realtime message to:", userId);
-    console.log("message sent by admin: ", newMessage);
+    // console.log("Emitting realtime message to:", userId);
+    // console.log("message sent by admin: ", newMessage);
 
     io.to(userId.toString()).emit("support:new-message", {
       conversationId: conversation._id,
