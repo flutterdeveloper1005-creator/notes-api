@@ -6,6 +6,7 @@ const authRoutes = require("./routes/auth.routes");
 const productRoutes = require("./routes/product.routes");
 const cartRoutes = require("./routes/cart.routes");
 const chatRoutes = require("./routes/chat.routes");
+const supportChatRoutes = require("./routes/supportChat.routes");
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use("/auth", authRoutes);
 app.use("/products", productRoutes);
 app.use("/cart", cartRoutes);
 app.use("/chat", chatRoutes);
+app.use("/support-chat", supportChatRoutes);
 
 
 module.exports = app;
