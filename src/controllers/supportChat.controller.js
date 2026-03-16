@@ -100,14 +100,23 @@ exports.getUserMessages = async (req, res) => {
       }
     );
 
+    // 🔹 EMIT UNREAD COUNT RESET
+    const io = getIO();
+
+    console.log("Emitting unread count reset to:", userId);
+    console.log("Unread count:", 0);
+
+
+    io.to(userId.toString()).emit("support:unread-count", {
+      unreadCount: 0
+    });
+
     const messages = await SupportMessage.find({
       conversationId: conversation._id
     })
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(parseInt(limit));
-
-    const io = getIO();
 
     io.to(userId.toString()).emit("support:messages-seen", {
       conversationId: conversation._id
@@ -209,6 +218,21 @@ exports.sendAdminMessage = async (req, res) => {
     io.to(userId.toString()).emit("support:new-message", {
       conversationId: conversation._id,
       message: newMessage
+    });
+
+    // 🔥 GET NEW UNREAD COUNT
+    const unreadCount = await SupportMessage.countDocuments({
+      userId,
+      senderRole: "admin",
+      isSeen: false
+    });
+
+    console.log("Emitting unread count update to:", userId);
+    console.log("Unread count:", unreadCount);
+
+    // 🔥 EMIT UNREAD COUNT
+    io.to(userId.toString()).emit("support:unread-count", {
+      unreadCount
     });
 
     res.json({
