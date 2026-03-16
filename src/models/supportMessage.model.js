@@ -28,8 +28,16 @@ const supportMessageSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
+    isSeen: {
+      type: Boolean,
+      default: false
+    }
+
   },
   { timestamps: true }
 );
+
+supportMessageSchema.index({ userId: 1, isSeen: 1 });
 
 module.exports = mongoose.model("SupportMessage", supportMessageSchema);

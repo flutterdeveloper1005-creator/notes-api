@@ -18,6 +18,12 @@ router.get(
   supportChatController.getUserMessages
 );
 
+router.get(
+  "/user/unread-count",
+  authMiddleware,
+  supportChatController.getUnreadCount
+);
+
 // Admin reply (no token required)
 router.post(
   "/admin/message",

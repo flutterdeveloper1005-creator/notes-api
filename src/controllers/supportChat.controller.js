@@ -89,6 +89,17 @@ exports.getUserMessages = async (req, res) => {
       });
     }
 
+    await SupportMessage.updateMany(
+      {
+        userId,
+        senderRole: "admin",
+        isSeen: false
+      },
+      {
+        $set: { isSeen: true }
+      }
+    );
+
     const messages = await SupportMessage.find({
       conversationId: conversation._id
     })
@@ -96,10 +107,46 @@ exports.getUserMessages = async (req, res) => {
       .skip((page - 1) * limit)
       .limit(parseInt(limit));
 
+    const io = getIO();
+
+    io.to(userId.toString()).emit("support:messages-seen", {
+      conversationId: conversation._id
+    });
+
     res.json({
       success: true,
       conversationId: conversation._id,
       messages
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
+
+  }
+
+};
+
+exports.getUnreadCount = async (req, res) => {
+
+  try {
+
+    const userId = req.user._id;
+
+    const count = await SupportMessage.countDocuments({
+      userId,
+      senderRole: "admin",
+      isSeen: false
+    });
+
+    res.json({
+      success: true,
+      unreadCount: count
     });
 
   } catch (error) {
@@ -145,7 +192,8 @@ exports.sendAdminMessage = async (req, res) => {
       userId,
       senderId: "admin_1",
       senderRole: "admin",
-      message
+      message,
+      isSeen: false
     });
 
     conversation.lastMessage = message;
